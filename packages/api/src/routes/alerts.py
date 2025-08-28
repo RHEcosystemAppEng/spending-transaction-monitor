@@ -7,7 +7,6 @@ from typing import List, Optional
 from db import get_db
 from db.models import AlertNotification, AlertRule, User
 from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -19,6 +18,8 @@ from ..schemas.alert import (
     AlertRuleOut,
     AlertRuleUpdate,
 )
+
+from ..services.notifications import Context, NotificationStrategy, SmtpStrategy
 
 router = APIRouter()
 
@@ -310,11 +311,14 @@ async def create_alert_notification(
         notificationMethod=payload.notificationMethod,
         status=payload.status,
     )
+
+    ctx = Context(SmtpStrategy())
+    notification = ctx.send_notification(notification)
     
     session.add(notification)
     await session.commit()
     await session.refresh(notification)
-    
+
     return AlertNotificationOut(
         id=notification.id,
         userId=notification.userId,
