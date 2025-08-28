@@ -21,6 +21,8 @@ dependencies = [
     "asyncpg>=0.29.0",
     "greenlet>=3.2.3",
     "kafka-python>=2.0.0",
+    "python-jose[cryptography]>=3.3.0",
+    "requests>=2.31.0",
     
     "spending-monitor-db",
 ]
